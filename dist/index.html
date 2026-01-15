@@ -10,8 +10,8 @@
   <meta content="Bibin Antony, Portfolio, Full Stack, Three.js, React, Node.js" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/me_bg.jpeg" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/assets/me_bg-DNghLLDs.jpeg" rel="icon">
+  <link href="/assets/apple-touch-icon-B3EXF15H.png" rel="apple-touch-icon">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,16 +20,12 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <!-- Vendor CSS Files -->
 
-  <!-- Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Main CSS File -->
 
   <!-- Import Map for Three.js -->
+
   <script type="importmap">
     {
       "imports": {
@@ -37,6 +33,8 @@
       }
     }
   </script>
+  <script type="module" crossorigin src="/assets/index-Jn7rx8Iq.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-48EF59T_.css">
 </head>
 
 <body class="dark-theme">
@@ -49,6 +47,11 @@
     <div class="mission-sub">Objective Text</div>
   </div>
 
+  <div class="unlock-notification" id="unlock-msg">UNLOCKED: ABOUT ME</div>
+  <div id="game-hud"
+    style="position:fixed; top:20px; right:20px; font-family:'Courier New'; color:#00f2ff; font-weight:bold; font-size:1.2rem; z-index:10001;">
+    Initializing...</div>
+  <button id="skip-btn" onclick="document.body.classList.remove('game-locked')">Skip Intro</button>
 
   <!-- Navigation -->
   <nav class="navbar navbar-expand-lg fixed-top">
@@ -72,11 +75,9 @@
   <section id="hero" class="d-flex align-items-center justify-content-center">
     <div class="container text-center hero-content">
       <h1 class="hero-title glitched">BIBIN ANTONY</h1>
-      <div>
-        <p class="hero-subtitle">Senior Full-Stack Developer • Open Source Contributor</p>
-      </div>
+      <p class="hero-subtitle">Senior Full-Stack Developer • Open Source Contributor</p>
       <div class="game-controls-hint">
-        <p>Use&nbsp;<span class="key">ARROWS</span>&nbsp;to Drive</p>
+        <p>Use <span class="key">WASD</span> or <span class="key">ARROWS</span> to Drive</p>
         <p class="small">Drive to zones to explore</p>
       </div>
     </div>
@@ -92,7 +93,7 @@
           <div class="row align-items-center">
             <div class="col-md-5 text-center">
               <div class="profile-img-container">
-                <img src="assets/img/me_bg.jpeg" class="img-fluid rounded-circle profile-img" alt="Bibin Antony">
+                <img src="/assets/me_bg-DNghLLDs.jpeg" class="img-fluid rounded-circle profile-img" alt="Bibin Antony">
               </div>
             </div>
             <div class="col-md-7">
@@ -104,7 +105,7 @@
               </p>
               <p>
                 My journey involves building more than <strong>10 scalable applications</strong> from scratch. I
-                specialize in the modern <strong>JavaScript ecosystem</strong> mastering React, Next.js, and Node.js to
+                specialize in the modern <strong>JavaScript ecosystem</strong>—mastering React, Next.js, and Node.js to
                 deliver seamless user experiences.
               </p>
               <p>
@@ -134,25 +135,25 @@
         <div class="row text-center g-4">
           <div class="col-6 col-md-3">
             <div class="stat-item glass-card">
-              <h3><span class="counter" data-target="7">0</span>+</h3>
+              <h3>7+</h3>
               <p>Years Exp</p>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-item glass-card">
-              <h3><span class="counter" data-target="10">0</span>+</h3>
+              <h3>10+</h3>
               <p>Apps Built</p>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-item glass-card">
-              <h3><span class="counter" data-target="20">0</span>k+</h3>
+              <h3>20k+</h3>
               <p>Downloads/Mo</p>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-item glass-card">
-              <h3><span class="counter" data-target="67">0</span>+</h3>
+              <h3>67+</h3>
               <p>Contributions</p>
             </div>
           </div>
@@ -161,31 +162,38 @@
     </section>
 
     <!-- Work / NPM Section -->
-    <section id="work" class="section-pad bg-light">
+    <section id="work" class="section-pad">
       <div class="container">
+        <h2 class="section-title text-center mb-5">Open Source / NPM Packages</h2>
 
-        <!-- Subsection: NPM Packages -->
-        <h2 class="section-title text-center mb-4" data-aos="fade-up">NPM Packages</h2>
-        <div class="row g-4 mb-5">
+        <div class="row g-4">
           <!-- 1. React Cron Generator -->
           <div class="col-md-6 col-lg-6">
             <div class="project-card glass-card h-100">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-success bg-opacity-75 rounded-pill shadow-sm">UI Scheduler</span>
+                  <span class="badge bg-success">NPM Package</span>
+                  <span class="badge bg-light text-dark border">v2.1.3</span>
                 </div>
                 <h3 class="mt-3">React Cron Generator</h3>
                 <p>A powerful component for building cron expressions with support for Unix and Quartz formats.
                   Essential for scheduling UIs.</p>
-                <div class="project-stats">
-                  <i class="bi bi-arrow-down-circle-fill"></i> <span>7.5k+ / Week</span>
+                <div class="stats mb-3">
+                  <i class="bi bi-download"></i> 7.5k+ Weekly Downloads
                 </div>
                 <div class="d-flex gap-2">
-                  <a href="https://sojinantony01.github.io/react-cron-generator/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View
-                    Demo</a>
+                  <button onclick="toggleDemo('demo-cron')" class="btn btn-primary btn-sm rounded-pill">View
+                    Demo</button>
                   <a href="https://www.npmjs.com/package/react-cron-generator" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">NPM</a>
+                    class="btn btn-outline-light btn-sm rounded-pill">NPM</a>
+                </div>
+                <!-- Demo Container -->
+                <div id="demo-cron" class="demo-container mt-3" style="display:none;">
+                  <iframe
+                    src="https://codesandbox.io/embed/react-cron-generator-demo-forked-3w22f?fontsize=14&hidenavigation=1&theme=dark"
+                    style="width:100%; height:300px; border:0; border-radius: 8px; overflow:hidden;"
+                    title="react-cron-generator-demo"
+                    sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
                 </div>
               </div>
             </div>
@@ -195,21 +203,25 @@
           <div class="col-md-6 col-lg-6">
             <div class="project-card glass-card h-100">
               <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-primary bg-opacity-75 rounded-pill shadow-sm">Data Grid</span>
-                </div>
+                <span class="badge bg-primary">Open Source</span>
                 <h3 class="mt-3">React Spread Sheet Excel</h3>
                 <p>High-performance spreadsheet component. Render 100k+ cells with formulas, formatting, and Excel-like
                   features.</p>
-                <div class="project-stats">
-                  <i class="bi bi-arrow-down-circle-fill"></i> <span>180+ / Week</span>
+                <div class="stats mb-3">
+                  <i class="bi bi-star"></i> Excel-like Features
                 </div>
                 <div class="d-flex gap-2">
-                  <a href="https://sojinantony01.github.io/react-spread-sheet" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View
-                    Demo</a>
+                  <button onclick="toggleDemo('demo-sheet')" class="btn btn-primary btn-sm rounded-pill">View
+                    Demo</button>
                   <a href="https://www.npmjs.com/package/react-spread-sheet-excel" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">NPM</a>
+                    class="btn btn-outline-light btn-sm rounded-pill">NPM</a>
+                </div>
+                <div id="demo-sheet" class="demo-container mt-3" style="display:none;">
+                  <iframe
+                    src="https://codesandbox.io/embed/react-spreadsheet-demo-l2q4p?fontsize=14&hidenavigation=1&theme=dark"
+                    style="width:100%; height:300px; border:0; border-radius: 8px; overflow:hidden;"
+                    title="react-spreadsheet-demo"
+                    sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
                 </div>
               </div>
             </div>
@@ -219,143 +231,59 @@
           <div class="col-md-6 col-lg-6">
             <div class="project-card glass-card h-100">
               <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-warning bg-opacity-75 text-dark rounded-pill shadow-sm">Table Helper</span>
-                </div>
+                <span class="badge bg-warning text-dark">Utility</span>
                 <h3 class="mt-3">React Table Column Resizer</h3>
                 <p>A lightweight utility to add drag-and-drop column resizing capabilities to standard HTML tables in
                   React.</p>
-                <div class="project-stats">
-                  <i class="bi bi-arrow-down-circle-fill"></i> <span>1.5k+ / Week</span>
+                <div class="stats mb-3">
+                  <i class="bi bi-star"></i> 3 Stars
                 </div>
                 <div class="d-flex gap-2">
-                  <a href="https://codesandbox.io/p/sandbox/react-table-column-resizer-3yuqv" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View
-                    Demo</a>
-                  <a href="https://www.npmjs.com/package/react-table-column-resizer" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">NPM</a>
+                  <button onclick="toggleDemo('demo-resize')" class="btn btn-primary btn-sm rounded-pill">View
+                    Demo</button>
+                  <a href="https://github.com/bibinantony1998/react-table-column-resizer" target="_blank"
+                    class="btn btn-outline-light btn-sm rounded-pill">GitHub</a>
+                </div>
+                <div id="demo-resize" class="demo-container mt-3" style="display:none;">
+                  <div class="alert alert-secondary text-dark">Demo loading... (Valid CodeSandbox URL needed for
+                    specific demo)</div>
+                  <!-- Placeholder using a generic table demo if specific one not found -->
+                  <iframe
+                    src="https://codesandbox.io/embed/react-table-resize-demo-k392s?fontsize=14&hidenavigation=1&theme=dark"
+                    style="width:100%; height:300px; border:0; border-radius: 8px; overflow:hidden;"
+                    title="react-table-resize"
+                    sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 4. React DND Dynamic Column -->
+          <!-- 4. React Drag and Drop Multiple Dynamic Column -->
           <div class="col-md-6 col-lg-6">
             <div class="project-card glass-card h-100">
               <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-info bg-opacity-75 text-dark rounded-pill shadow-sm">Drag & Drop</span>
-                </div>
+                <span class="badge bg-info text-dark">Complex UI</span>
                 <h3 class="mt-3">React DND Dynamic Column</h3>
                 <p>Advanced drag-and-drop component for multiple dynamic columns using native HTML5 APIs.</p>
-                <div class="project-stats">
-                  <i class="bi bi-boxes"></i> <span>Complex UI Module</span>
+                <div class="stats mb-3">
+                  <i class="bi bi-box"></i> v2.0.1
                 </div>
                 <div class="d-flex gap-2">
-                  <a href="https://bibinantony1998.github.io/react-drag-and-drop-multiple/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View Demo</a>
+                  <button onclick="toggleDemo('demo-dnd')" class="btn btn-primary btn-sm rounded-pill">View
+                    Demo</button>
                   <a href="https://www.npmjs.com/package/react-drag-and-drop-multiple-dynamic-column" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">NPM</a>
+                    class="btn btn-outline-light btn-sm rounded-pill">NPM</a>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Subsection: GitHub Experiments -->
-        <h2 class="section-title text-center mb-4" data-aos="fade-up">GitHub Experiments</h2>
-        <div class="row g-4">
-          <!-- 1. Flower Dancing Animation -->
-          <div class="col-md-6 col-lg-6">
-            <div class="project-card glass-card h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-danger bg-opacity-75 rounded-pill shadow-sm">CSS Animation</span>
-                </div>
-                <h3 class="mt-3">Flower Dancing</h3>
-                <p>A pure HTML/CSS flower dancing animation with minimal JS for loading detection. Smooth and organic.
-                </p>
-                <div class="project-stats">
-                  <i class="bi bi-flower1"></i> <span>Organic Movement</span>
-                </div>
-                <div class="d-flex gap-2">
-                  <a href="https://bibinantony1998.github.io/flower-dancing-animation-/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View Demo</a>
-                  <a href="https://github.com/bibinantony1998/flower-dancing-animation-" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">Code</a>
+                <div id="demo-dnd" class="demo-container mt-3" style="display:none;">
+                  <iframe
+                    src="https://codesandbox.io/embed/react-beautiful-dnd-matrix-m4dc8?fontsize=14&hidenavigation=1&theme=dark"
+                    style="width:100%; height:300px; border:0; border-radius: 8px; overflow:hidden;" title="dnd-demo"
+                    sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 2. Tree Blossom Animation -->
-          <div class="col-md-6 col-lg-6">
-            <div class="project-card glass-card h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-success bg-opacity-75 rounded-pill shadow-sm">Nature</span>
-                </div>
-                <h3 class="mt-3">Tree Blossom</h3>
-                <p>A generative animation simulating the blooming of a tree. Visualizes the growth and beauty of nature.
-                </p>
-                <div class="project-stats">
-                  <i class="bi bi-tree"></i> <span>Generative Art</span>
-                </div>
-                <div class="d-flex gap-2">
-                  <a href="https://bibinantony1998.github.io/tree-blossom-animation/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View Demo</a>
-                  <a href="https://github.com/bibinantony1998/tree-blossom-animation" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">Code</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Newtons Pendulum -->
-          <div class="col-md-6 col-lg-6">
-            <div class="project-card glass-card h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-info bg-opacity-75 text-dark rounded-pill shadow-sm">Physics</span>
-                </div>
-                <h3 class="mt-3">Newtons Pendulum</h3>
-                <p>A satisfying physics simulation of Newton's cradle using JavaScript. Demonstrates momentum
-                  conservation.</p>
-                <div class="project-stats">
-                  <i class="bi bi-circle-half"></i> <span>Physics Sim</span>
-                </div>
-                <div class="d-flex gap-2">
-                  <a href="https://bibinantony1998.github.io/newtons-pendulum-animation/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View Demo</a>
-                  <a href="https://github.com/bibinantony1998/newtons-pendulum-animation" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">Code</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 4. Curtain Line Animation -->
-          <div class="col-md-6 col-lg-6">
-            <div class="project-card glass-card h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="badge bg-secondary bg-opacity-75 rounded-pill shadow-sm">Interactive</span>
-                </div>
-                <h3 class="mt-3">Curtain Line</h3>
-                <p>An interactive curtain line animation that responds to mouse movement. Creates a fluid, textile-like
-                  effect.</p>
-                <div class="project-stats">
-                  <i class="bi bi-bezier2"></i> <span>Mouse Interaction</span>
-                </div>
-                <div class="d-flex gap-2">
-                  <a href="https://bibinantony1998.github.io/curtain-line-animation/" target="_blank"
-                    class="btn btn-primary rounded-pill shadow-sm">View Demo</a>
-                  <a href="https://github.com/bibinantony1998/curtain-line-animation" target="_blank"
-                    class="btn btn-outline-dark rounded-pill">Code</a>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -408,7 +336,7 @@
     <!-- Contact Section -->
     <section id="contact" class="section-pad">
       <div class="container">
-        <div class="glass-card text-center mw-800 mx-auto" data-aos="zoom-in">
+        <div class="glass-card text-center">
           <h2 class="section-title">Let's Connect</h2>
           <p class="lead mb-4">Open for collaborations and interesting conversations.</p>
 
@@ -429,58 +357,8 @@
 
   <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/main.js"></script>
 
-  <!-- Game Logic -->
-  <script type="module" src="assets/js/game.js"></script>
-
-  <!-- Counter Animation Script (Isolated) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const counters = document.querySelectorAll('.counter');
-
-      const animateCounter = (el) => {
-        if (el.getAttribute('data-animated')) return;
-        el.setAttribute('data-animated', 'true');
-
-        const target = +el.getAttribute('data-target');
-        const duration = 1500;
-        const frameDuration = 1000 / 60;
-        const totalFrames = Math.round(duration / frameDuration);
-
-        let frame = 0;
-        const update = () => {
-          frame++;
-          const progress = frame / totalFrames;
-          const ease = 1 - Math.pow(1 - progress, 4); // EaseOutQuart
-          const current = Math.round(target * ease);
-
-          if (frame < totalFrames) {
-            el.innerText = current;
-            requestAnimationFrame(update);
-          } else {
-            el.innerText = target;
-          }
-        };
-        update();
-      };
-
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries, obs) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              animateCounter(entry.target);
-              obs.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-
-        counters.forEach(counter => observer.observe(counter));
-      } else {
-        counters.forEach(c => animateCounter(c));
-      }
-    });
-  </script>
+  <!-- Game Logic -->
 
 </body>
 <script>
