@@ -1,255 +1,424 @@
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-// --- Configuration ---
-const CONFIG = {
-    bloom: {
-        strength: 1.5,
-        radius: 0.4,
-        threshold: 0
-    },
-    physics: {
-        maxSpeed: 1.2,
-        acceleration: 0.03,
-        friction: 0.98,
-        turnSpeed: 0.05,
-        driftFactor: 0.96
-    },
-    camera: {
-        height: 8,
-        distance: 12,
-        lag: 0.1
-    }
-};
-
-// --- Global State ---
-let scene, camera, renderer, composer;
-let car, carBody;
-let terrainParams = { speed: 0, offset: 0 };
-let gameState = {
-    level: 1,
-    locked: true
-};
-
-// Input State
-const keys = { w: false, a: false, s: false, d: false, Shift: false };
+// --- Global Variables ---
+let scene, camera, renderer;
+let car, carBody, wheels = [];
+let terrainMesh; // The ground
+let obstacles = []; // Bushes/Rocks
+let clouds = []; // Floating clouds
+let velocity = 0;
+const maxSpeed = 0.5;
+const acceleration = 0.01;
+const friction = 0.98;
+const turnSensitivity = 0.03;
+const WORLD_SIZE = 140;
 
 // Physics State
-let velocity = 0;
-let driftAngle = 0;
+let angularVelocity = 0;
+let houses = [];
+
+// Input State
+const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
 
 init();
 animate();
 
+function animate() {
+    requestAnimationFrame(animate);
+    updatePhysics();
+    renderer.render(scene, camera);
+}
+
+// Ensure random houses are generated
 function init() {
-    // 1. Scene
+    // 1. Scene Setup - Classic Nature
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050510); // Deep Space Blue/Black
-    scene.fog = new THREE.FogExp2(0x050510, 0.015);
+    scene.background = new THREE.Color(0xffffff);
+    scene.fog = new THREE.Fog(0xffffff, 20, 100);
+
+    // FIX: Force Scroll to Top & Disable Restoration
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    // Ensure scroll is possible
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
 
     // 2. Camera
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 5, 10);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 8, -15); // Behind car
+    camera.lookAt(0, 0, 0);
 
     // 3. Renderer
-    const canvas = document.querySelector('#gameOverlay');
-    // Context Fix
+    let canvas = document.querySelector('#gameOverlay');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'gameOverlay';
+        document.body.prepend(canvas);
+    }
     if (canvas.dataset.engine) {
         const newCanvas = canvas.cloneNode(true);
         canvas.parentNode.replaceChild(newCanvas, canvas);
         canvas = newCanvas;
     }
 
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance" }); // Antialias off for Bloom perf
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    // 4. Post-Processing (BLOOM)
-    const renderScene = new RenderPass(scene, camera);
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-    bloomPass.threshold = CONFIG.bloom.threshold;
-    bloomPass.strength = CONFIG.bloom.strength;
-    bloomPass.radius = CONFIG.bloom.radius;
+    // 4. Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
 
-    composer = new EffectComposer(renderer);
-    composer.addPass(renderScene);
-    composer.addPass(bloomPass);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    sunLight.position.set(50, 100, 50);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
+    scene.add(sunLight);
 
-    // 5. Lighting (Cinematic)
-    const ambientInfo = new THREE.AmbientLight(0x4040a0, 1.5); // Blue tint
-    scene.add(ambientInfo);
+    // 5. Environment
+    createSimpleTerrain();
+    createVegetation();
+    createClouds();
 
-    const sun = new THREE.DirectionalLight(0xff00ff, 2); // Pink Sun
-    sun.position.set(-50, 20, -50);
-    sun.castShadow = true;
-    scene.add(sun);
+    // Checkpoints (Houses) - Random Scatter & Clear Spawn
+    let houseCount = 0;
+    while (houseCount < 6) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 30 + Math.random() * 90; // 30 to 120 radius
+        const hx = Math.sin(angle) * radius;
+        const hz = Math.cos(angle) * radius;
 
-    const spot = new THREE.SpotLight(0x00f2ff, 10); // Cyan Highlight
-    spot.position.set(20, 50, 20);
-    spot.angle = 0.5;
-    spot.penumbra = 0.5;
-    scene.add(spot);
+        // Final Safety Check
+        if (Math.abs(hx) > 10 || Math.abs(hz) > 10) {
+            createHouse(hx, hz, Math.random() * Math.PI * 2);
+            houseCount++;
+        }
+    }
 
-    // 6. World & Player
-    createLevel1();
-    createPlayer();
+    console.log("Game Initialized. Obstacles:", obstacles.length); // DEBUG
 
-    // 7. Events
-    window.addEventListener('resize', onResize);
+    // 6. Car
+    createCar();
+
+    // 7. Inputs
+    window.addEventListener('resize', onWindowResize);
     document.addEventListener('keydown', (e) => onKey(e, true));
     document.addEventListener('keyup', (e) => onKey(e, false));
-
-    // Initial Lock UI (simulated)
-    document.body.classList.add('game-locked');
 }
 
-function onKey(e, pressed) {
-    const k = e.key.toLowerCase();
-    if (keys.hasOwnProperty(k)) keys[k] = pressed;
-    if (e.key === 'Shift') keys.Shift = pressed;
-    if (e.code === 'ArrowUp') keys.w = pressed;
-    if (e.code === 'ArrowDown') keys.s = pressed;
-    if (e.code === 'ArrowLeft') keys.a = pressed;
-    if (e.code === 'ArrowRight') keys.d = pressed;
+function createHouse(x, z, rotationY) {
+    const group = new THREE.Group();
+
+    // Even Smaller House Dimensions
+    // Base
+    const baseGeo = new THREE.BoxGeometry(3, 2.5, 3);
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+    const base = new THREE.Mesh(baseGeo, baseMat);
+    base.position.y = 1.25;
+    base.castShadow = true;
+    group.add(base);
+
+    // Roof
+    const roofGeo = new THREE.ConeGeometry(2.8, 1.8, 4);
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+    const roof = new THREE.Mesh(roofGeo, roofMat);
+    roof.position.y = 3.2;
+    roof.rotation.y = Math.PI / 4;
+    roof.castShadow = true;
+    group.add(roof);
+
+    // Door
+    const doorGeo = new THREE.BoxGeometry(0.8, 1.5, 0.2);
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x4a3c31 });
+    const door = new THREE.Mesh(doorGeo, doorMat);
+    door.position.set(0, 0.8, 1.51);
+    group.add(door);
+
+    // Position
+    const y = getTerrainHeight(x, z);
+    group.position.set(x, y, z);
+    if (rotationY) group.rotation.y = rotationY;
+
+    scene.add(group);
+    obstacles.push({ mesh: group, radius: 2.5, type: 'house' });
 }
 
-function createPlayer() {
-    car = new THREE.Group();
+function checkCollisions(nextX, nextZ) {
+    const carRadius = 1.5;
+    for (let obs of obstacles) {
+        const dx = nextX - obs.mesh.position.x;
+        const dz = nextZ - obs.mesh.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
 
-    // Chassis (Cyber-Truck Style)
-    const geo = new THREE.BufferGeometry();
-    // Simple low-poly cyberpunk car shape
-    // Placeholder Box for now, but with neon edges
-    const box = new THREE.BoxGeometry(2, 0.8, 4.5);
-    const mat = new THREE.MeshStandardMaterial({
-        color: 0x111111,
-        roughness: 0.2,
-        metalness: 0.9
-    });
-    const mesh = new THREE.Mesh(box, mat);
-    mesh.position.y = 0.7;
-    car.add(mesh);
+        if (dist < 10) {
+            console.log("Close to obstacle:", dist); // DEBUG
+        }
 
-    // Neon Strips
-    const stripGeo = new THREE.BoxGeometry(2.05, 0.1, 4.6);
-    const stripMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff }); // Cyan Glow
-    const strip = new THREE.Mesh(stripGeo, stripMat);
-    strip.position.y = 0.4;
-    car.add(strip);
-
-    // Engine Glow (Rear)
-    const engineGeo = new THREE.BoxGeometry(1.8, 0.4, 0.1);
-    const engineMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const engine = new THREE.Mesh(engineGeo, engineMat);
-    engine.position.set(0, 0.8, 2.25);
-    car.add(engine);
-
-    scene.add(car);
-}
-
-function createLevel1() {
-    // Infinite Highway (Synthwave Grid)
-    // Instead of moving the car forward infinitely, we move the WORLD backwards?
-    // Or just move car and generate new tiles.
-    // Let's do Infinite Scrolling Grid Shader on a Plane.
-
-    const gridGeo = new THREE.PlaneGeometry(500, 500, 100, 100);
-    gridGeo.rotateX(-Math.PI / 2);
-
-    // Custom Material for animation
-    const gridMat = new THREE.MeshStandardMaterial({
-        color: 0x000000,
-        emissive: 0x220033,
-        roughness: 0.1,
-        metalness: 0.8,
-        wireframe: true
-    });
-
-    const floor = new THREE.Mesh(gridGeo, gridMat);
-    floor.position.y = -0.1;
-    scene.add(floor);
-
-    // Mountains / Cityscape (Procedural later)
-    // For now, just decorative neon pillars
-    for (let i = 0; i < 40; i++) {
-        const h = Math.random() * 20 + 5;
-        const geo = new THREE.BoxGeometry(2, h, 2);
-        const mat = new THREE.MeshLambertMaterial({ color: Math.random() > 0.5 ? 0xff00ff : 0x00f2ff });
-        const mesh = new THREE.Mesh(geo, mat);
-
-        mesh.position.x = (Math.random() - 0.5) * 200;
-        if (Math.abs(mesh.position.x) < 20) mesh.position.x += 30; // Clear road
-        mesh.position.z = (Math.random() - 0.5) * 500;
-        mesh.position.y = h / 2;
-        scene.add(mesh);
+        if (dist < (carRadius + obs.radius)) {
+            console.log("HIT!", obs); // DEBUG
+            return { obstacle: obs.mesh, dist: dist, type: obs.type };
+        }
     }
+    return null;
 }
 
-function updatePhysics() {
-    // Acceleration
-    if (keys.w) velocity += CONFIG.physics.acceleration;
-    if (keys.s) velocity -= CONFIG.physics.acceleration;
+// --- Logic ---
 
-    // Friction
-    velocity *= CONFIG.physics.friction;
-
-    // Cap Speed
-    if (Math.abs(velocity) > CONFIG.physics.maxSpeed) {
-        velocity = Math.sign(velocity) * CONFIG.physics.maxSpeed;
-    }
-
-    // Turning & Drift
-    if (Math.abs(velocity) > 0.05) {
-        const turnDir = keys.a ? 1 : (keys.d ? -1 : 0);
-
-        // Drift mechanics:
-        // If Shift is held, we slide more (less rotation grip, more momentum)
-        // Simple implementation:
-        car.rotation.y += turnDir * CONFIG.physics.turnSpeed * Math.sign(velocity);
-
-        // Cosmetic Drift (Car body rotation local)
-        // car.children[0].rotation.z ... (todo)
-    }
-
-    // Move Car
-    car.position.x += Math.sin(car.rotation.y) * velocity;
-    car.position.z += Math.cos(car.rotation.y) * velocity;
-
-    // Infinite World Loop (Illusion)
-    // If car goes too far, reset? No, let's just let it drive for Level 1.
-}
-
-function updateCamera() {
-    if (!car) return;
-
-    // Smooth Follow
-    const targetPos = new THREE.Vector3(
-        car.position.x - Math.sin(car.rotation.y) * CONFIG.camera.distance,
-        car.position.y + CONFIG.camera.height,
-        car.position.z - Math.cos(car.rotation.y) * CONFIG.camera.distance
-    );
-
-    camera.position.lerp(targetPos, CONFIG.camera.lag);
-    camera.lookAt(car.position.x, car.position.y + 2, car.position.z);
-}
-
-function onResize() {
-    // Quality of life resize
+function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function animate() {
-    requestAnimationFrame(animate);
+function updatePhysics() {
+    // Inputs
+    let moveFwd = keys.w || keys.ArrowUp;
+    let moveBwd = keys.s || keys.ArrowDown;
+    let turnL = keys.a || keys.ArrowLeft;
+    let turnR = keys.d || keys.ArrowRight;
 
-    updatePhysics();
-    updateCamera();
+    // Accel
+    if (moveFwd) velocity += acceleration;
+    if (moveBwd) velocity -= acceleration;
 
-    // renderer.render(scene, camera);
-    composer.render(); // Use Composer for Bloom
+    // Friction
+    velocity *= friction;
+    angularVelocity *= 0.9;
+
+    // Turn
+    if (Math.abs(velocity) > 0.01) {
+        if (turnL) car.rotation.y += turnSensitivity * Math.sign(velocity);
+        if (turnR) car.rotation.y -= turnSensitivity * Math.sign(velocity);
+    }
+
+    // Apply Spin
+    car.rotation.y += angularVelocity;
+
+    // Proposed Move
+    const nextX = car.position.x + Math.sin(car.rotation.y) * velocity;
+    const nextZ = car.position.z + Math.cos(car.rotation.y) * velocity;
+
+    // Collision Check
+    const col = checkCollisions(nextX, nextZ);
+
+    if (col) {
+        const dx = col.obstacle.position.x - car.position.x;
+        const dz = col.obstacle.position.z - car.position.z;
+        const angle = Math.atan2(dz, dx);
+
+        if (col.type === 'bush') {
+            // BUSH: Slow down logically (Drag), pass through
+            // Don't stop, just drag
+            velocity *= 0.95;
+            car.position.x = nextX;
+            car.position.z = nextZ;
+
+        } else if (col.type === 'house') {
+            // HOUSE: Stop dead (Park). Logic checkpoint.
+            velocity = 0;
+            // Gentle push out to prevent clipping
+            const pushDist = 0.5;
+            car.position.x -= Math.cos(angle) * pushDist;
+            car.position.z -= Math.sin(angle) * pushDist;
+
+        } else {
+            // ROCK: Hard Bounce & Spin
+            velocity = -velocity * 0.8;
+
+            const rightX = Math.cos(car.rotation.y);
+            const rightZ = -Math.sin(car.rotation.y);
+            const dot = (dx * rightX + dz * rightZ);
+
+            angularVelocity += -dot * 0.2 * (Math.abs(velocity) + 1.0);
+
+            const pushDist = 1.2;
+            car.position.x -= Math.cos(angle) * pushDist;
+            car.position.z -= Math.sin(angle) * pushDist;
+        }
+
+    } else {
+        // Boundary Check
+        if (Math.abs(nextX) < WORLD_SIZE && Math.abs(nextZ) < WORLD_SIZE) {
+            car.position.x = nextX;
+            car.position.z = nextZ;
+        } else {
+            velocity = -velocity * 0.5;
+            angularVelocity += (Math.random() - 0.5) * 0.1;
+        }
+    }
+
+    // Terrain Follow
+    const groundH = getTerrainHeight(car.position.x, car.position.z);
+    car.position.y = THREE.MathUtils.lerp(car.position.y, groundH, 0.2);
+
+    // Tilt
+    const frontH = getTerrainHeight(
+        car.position.x + Math.sin(car.rotation.y),
+        car.position.z + Math.cos(car.rotation.y)
+    );
+    const pitch = (frontH - groundH) * 0.5;
+    car.rotation.x = THREE.MathUtils.lerp(car.rotation.x, pitch, 0.1);
+
+    // --- Drive-to-Scroll Sync (Relative/Directional) ---
+    // If driving "Down" (South/Positive Z) -> Scroll Down
+    // If driving "Up" (North/Negative Z) -> Scroll Up
+
+    // Calculate Z movement component
+    const moveZ = Math.cos(car.rotation.y) * velocity;
+
+    // Check Direction logic (Top vs Bottom part approximation)
+    if (Math.abs(moveZ) > 0.01) {
+        const scrollSensitivity = 20.0; // Increased sensitivity
+        window.scrollBy(0, moveZ * scrollSensitivity);
+    }
+
+    // Camera Follow
+    const relOffset = new THREE.Vector3(0, 7, -14);
+    const camOffset = relOffset.applyMatrix4(car.matrixWorld);
+    camera.position.lerp(camOffset, 0.1);
+    camera.lookAt(car.position.x, car.position.y + 1, car.position.z);
+}
+
+function onKey(e, pressed) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        if (e.type === 'keydown') e.preventDefault();
+    }
+    if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.code)) {
+        keys[e.key] = pressed;
+        keys[e.code] = pressed;
+    }
+}
+
+// --- World Generation ---
+
+function getTerrainHeight(x, z) {
+    // Gentle rolling hills
+    return Math.sin(x * 0.05) * Math.cos(z * 0.05) * 2;
+}
+
+function createSimpleTerrain() {
+    const geometry = new THREE.PlaneGeometry(300, 300, 64, 64);
+    geometry.rotateX(-Math.PI / 2);
+
+    const positions = geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const z = positions.getZ(i);
+        const y = getTerrainHeight(x, z);
+        positions.setY(i, y);
+    }
+    geometry.computeVertexNormals();
+
+    const material = new THREE.MeshStandardMaterial({
+        color: 0x5cb85c, // Vibrant Green
+        roughness: 0.8,
+        metalness: 0.0
+    });
+
+    terrainMesh = new THREE.Mesh(geometry, material);
+    terrainMesh.receiveShadow = true;
+    scene.add(terrainMesh);
+}
+
+function createVegetation() {
+    // Bushes (Spheres)
+    const bushGeo = new THREE.SphereGeometry(1, 8, 8);
+    const bushMat = new THREE.MeshStandardMaterial({ color: 0x3d8b3d });
+
+    for (let i = 0; i < 50; i++) {
+        const x = (Math.random() - 0.5) * 200;
+        const z = (Math.random() - 0.5) * 200;
+
+        // Clear Spawn Area
+        if (Math.abs(x) < 15 && Math.abs(z) < 15) continue;
+
+        const bush = new THREE.Mesh(bushGeo, bushMat);
+        const y = getTerrainHeight(x, z);
+
+        bush.position.set(x, y + 0.5, z);
+        bush.scale.set(1.5 + Math.random(), 1.0, 1.5 + Math.random()); // Wider but normal height
+        bush.castShadow = true;
+        scene.add(bush);
+        obstacles.push({ mesh: bush, radius: 1.5, type: 'bush' });
+    }
+
+    // Rocks (Dodecahedrons)
+    const rockGeo = new THREE.DodecahedronGeometry(1.2);
+    const rockMat = new THREE.MeshStandardMaterial({ color: 0x888888 });
+
+    for (let i = 0; i < 30; i++) {
+        const x = (Math.random() - 0.5) * 200;
+        const z = (Math.random() - 0.5) * 200;
+
+        // Clear Spawn Area
+        if (Math.abs(x) < 15 && Math.abs(z) < 15) continue;
+
+        const rock = new THREE.Mesh(rockGeo, rockMat);
+        const y = getTerrainHeight(x, z);
+
+        rock.position.set(x, y + 0.6, z);
+        rock.rotation.set(Math.random(), Math.random(), Math.random());
+        rock.castShadow = true;
+        scene.add(rock);
+        obstacles.push({ mesh: rock, radius: 1.8, type: 'rock' });
+    }
+}
+
+function createClouds() {
+    const geo = new THREE.BoxGeometry(4, 1, 3);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+
+    for (let i = 0; i < 10; i++) {
+        const cloud = new THREE.Mesh(geo, mat);
+        cloud.position.set(
+            (Math.random() - 0.5) * 200,
+            20 + Math.random() * 10,
+            (Math.random() - 0.5) * 200
+        );
+        scene.add(cloud);
+        clouds.push(cloud);
+    }
+}
+
+function createCar() {
+    car = new THREE.Group();
+
+    // Red Boxy Body
+    const bodyGeo = new THREE.BoxGeometry(1.8, 0.8, 3.5);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xd9534f }); // Classic Bootstrap Danger Red
+    carBody = new THREE.Mesh(bodyGeo, bodyMat);
+    carBody.position.y = 0.8;
+    carBody.castShadow = true;
+    car.add(carBody);
+
+    // Top
+    const topGeo = new THREE.BoxGeometry(1.4, 0.6, 2.0);
+    const topMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const top = new THREE.Mesh(topGeo, topMat);
+    top.position.set(0, 1.5, -0.2);
+    top.castShadow = true;
+    car.add(top);
+
+    // Wheels
+    const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 12);
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const positions = [
+        { x: 1, z: 1.2 }, { x: -1, z: 1.2 },
+        { x: 1, z: -1.2 }, { x: -1, z: -1.2 }
+    ];
+
+    positions.forEach(p => {
+        const w = new THREE.Mesh(wheelGeo, wheelMat);
+        w.position.set(p.x, 0.4, p.z);
+        w.rotation.z = Math.PI / 2;
+        w.castShadow = true;
+        car.add(w);
+    });
+
+    scene.add(car);
 }
