@@ -284,6 +284,29 @@ a:hover {
     pointer-events: none;
 }
 
+.project-stats {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 15px 0;
+    /* Equal spacing above and below */
+}
+
+.project-stats i {
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--accent-secondary), #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(241, 196, 15, 0.2));
+}
+
 .profile-img {
     width: 200px;
     height: 200px;
@@ -304,6 +327,47 @@ a:hover {
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* Project Card Updates */
+.project-card .badge {
+    padding: 8px 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.project-card .btn {
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Bouncy transition */
+    border-width: 1px;
+    text-transform: uppercase;
+}
+
+.project-card .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary), #27ae60);
+    border: none;
+    box-shadow: 0 3px 10px rgba(45, 138, 62, 0.2);
+}
+
+.project-card .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(45, 138, 62, 0.3);
+}
+
+.project-card .btn-outline-dark {
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+}
+
+.project-card .btn-outline-dark:hover {
+    background: var(--text-primary);
+    color: #fff;
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
 }
 
 /* Skills */
