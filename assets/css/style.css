@@ -534,3 +534,22 @@ a:hover {
     overflow: hidden;
     transform: none !important;
 }
+
+/* Blog Slider Customization */
+.blog-slider {
+    padding-bottom: 50px;
+    /* Space for pagination to avoid overlap */
+    padding-top: 30px;
+    /* Space for hover effect */
+}
+
+.blog-slider .swiper-pagination {
+    bottom: 0 !important;
+    /* Move pagination to the very bottom */
+}
+
+/* Ensure slides stretch to equal height */
+.blog-slider .swiper-wrapper {
+    height: auto !important;
+    align-items: stretch;
+}

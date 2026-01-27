@@ -430,46 +430,14 @@
     <section id="blog" class="section-pad">
       <div class="container">
         <h2 class="section-title text-center mb-5">Latest Articles</h2>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <a href="https://medium.com/@bibinAntonybibinAntony/do-ai-replace-developers-thought-after-google-i-o-c357be5e39bc"
-              target="_blank" class="text-decoration-none">
-              <div class="blog-card glass-card h-100">
-                <div class="card-body">
-                  <span class="date">Medium</span>
-                  <h4>Do AI Replace Developers?</h4>
-                  <p>Thoughts after Google I/O on the future of software engineering.</p>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="https://medium.com/@bibinAntonybibinAntony/web-animations-a-walk-through-c4ade5e19362"
-              target="_blank" class="text-decoration-none">
-              <div class="blog-card glass-card h-100">
-                <div class="card-body">
-                  <span class="date">Medium</span>
-                  <h4>Web Animations Walkthrough</h4>
-                  <p>A comprehensive guide to performant web animations.</p>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="https://medium.com/@bibinAntonybibinAntony/next-js-when-to-use-and-how-to-use-165cae13e69a"
-              target="_blank" class="text-decoration-none">
-              <div class="blog-card glass-card h-100">
-                <div class="card-body">
-                  <span class="date">Medium</span>
-                  <h4>Next.js: When & How</h4>
-                  <p>Best practices for choosing and using Next.js.</p>
-                </div>
-              </div>
-            </a>
-          </div>
+        <div class="row g-4" id="blog-container">
+          <!-- Blogs will be injected here via assets/js/blog.js -->
         </div>
       </div>
     </section>
+
+    <!-- Blog Logic -->
+    <script src="assets/js/blog.js"></script>
 
     <!-- Contact Section -->
     <section id="contact" class="section-pad">
@@ -495,6 +463,7 @@
 
   <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/js/main.js"></script>
 
   <!-- Game Logic -->

@@ -135,7 +135,6 @@ function shadeRGBColor(color, percent) {
         if (flower.step() > 0) {
           return acc.concat([flower]);
         } else {
-          console.log("deleting flower", flower.idx);
           flower.delete();
           delete branchesInUse[flower.idx];
           return acc;

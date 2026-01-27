@@ -100,7 +100,6 @@ function init() {
         }
     }
 
-    console.log("Game Initialized. Obstacles:", obstacles.length); // DEBUG
 
     // 6. Car
     createCar();
@@ -155,12 +154,8 @@ function checkCollisions(nextX, nextZ) {
         const dz = nextZ - obs.mesh.position.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
 
-        if (dist < 10) {
-            console.log("Close to obstacle:", dist); // DEBUG
-        }
 
         if (dist < (carRadius + obs.radius)) {
-            console.log("HIT!", obs); // DEBUG
             return { obstacle: obs.mesh, dist: dist, type: obs.type };
         }
     }
