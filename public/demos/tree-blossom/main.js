@@ -231,20 +231,24 @@ function shadeRGBColor(color, percent) {
 
   // returns a promise that resolves to an array of the positions of the branches
   const drawTree = (maxDepth, trunkWidth) => {
+    const scaleFactor = Math.min(window.innerHeight / 640, 1.3); // Adjusted to 640 for tighter fit
+    const length = 60 * scaleFactor;
+    const scaledTrunkWidth = trunkWidth * scaleFactor;
+
     return drawBranch(
       Math.floor(window.innerWidth / 2),
-      Math.floor(window.innerHeight / 1.02),
-      60,
+      window.innerHeight,
+      length,
       -Math.PI / 2,
       maxDepth,
-      trunkWidth,
+      scaledTrunkWidth,
       BRANCH_COLOR
     );
   };
 
   const init = () => {
-    svg.setAttribute("width", window.innerWidth);
-    svg.setAttribute("height", window.innerHeight);
+    // svg.setAttribute("width", window.innerWidth);
+    // svg.setAttribute("height", window.innerHeight);
     drawTree(maxDepth, trunkWidth).then(animateFlowers);
   };
 

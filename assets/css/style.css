@@ -527,3 +527,10 @@ a:hover {
         opacity: 1;
     }
 }
+
+/* GitHub Experiment Card Specifics */
+.glass-card-experiment {
+    padding: 0 0 40px 0 !important;
+    overflow: hidden;
+    transform: none !important;
+}
