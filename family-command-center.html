@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Family Command Center | Bibin Antony</title>
+  <meta content="A comprehensive digital hub for household management." name="description">
+  <meta content="React, Vite, Supabase, Family App, Chores, Expenses" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/me_bg.jpeg" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    /* Modern UI Upgrades */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      background-color: #f8fafc;
+    }
+
+    /* Enhanced Hero Section */
+    .hero-single {
+      height: 50vh;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+      position: relative;
+      background: var(--primary-gradient);
+      overflow: visible;
+    }
+
+    .hero-single::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -1px;
+      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ... (keeping existing styles) ... */
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 991px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-single {
+        height: auto;
+        min-height: auto;
+        padding-top: 120px;
+        padding-bottom: 60px;
+      }
+    }
+
+    .breadcrumb {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(5px);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      display: inline-flex;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .breadcrumb-item.active {
+      color: white;
+      font-weight: 600;
+    }
+
+    .breadcrumb-item+.breadcrumb-item::before {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Polished Main Cards */
+    .section-pad {
+      padding: 80px 0;
+    }
+
+    .glass-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .glass-card h3 {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    /* List Styling */
+    .portfolio-info ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .portfolio-info ul li {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+      color: #64748b;
+    }
+
+    .portfolio-info ul li:last-child {
+      border-bottom: none;
+    }
+
+    .portfolio-info ul li strong {
+      color: #334155;
+      min-width: 120px;
+      font-weight: 600;
+    }
+
+    /* Feature List */
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .feature-item:hover {
+      background: #f1f5f9;
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      background: #e0e7ff;
+      color: #4f46e5;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .feature-text strong {
+      display: block;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-text {
+      color: #64748b;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Swiper Overlay fix */
+    .swiper-slide {
+      padding: 1rem;
+    }
+
+    .screenshot-card {
+      box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    /* Disable hover scale and style shifts on carousel */
+    .portfolio-details-slider.glass-card,
+    .portfolio-details-slider.glass-card:hover {
+      transform: none !important;
+      transition: none !important;
+      background: white !important;
+      border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Inner cards: Keep gradient bg (don't override), just fix border/transform */
+    .portfolio-details-slider .glass-card,
+    .portfolio-details-slider .glass-card:hover {
+      transform: none !important;
+      transition: none !important;
+      border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Custom Grid Split 6.5 / 5.5 */
+    @media (min-width: 992px) {
+      .col-custom-main {
+        flex: 0 0 auto;
+        width: 54.16666667%;
+      }
+
+      .col-custom-sidebar {
+        flex: 0 0 auto;
+        width: 45.83333333%;
+      }
+    }
+  </style>
+</head>
+
+<body class="dark-theme">
+
+  <!-- ======= Header / Navigation ======= -->
+  <nav id="header" class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">BIBIN.DEV</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+        <span class="navbar-toggler-icon"><i class="bi bi-list"></i></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbar">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="index.html#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#work">Work</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#blog">Blog</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav><!-- End Header -->
+
+  <!-- Enhanced Hero -->
+  <div class="hero hero-single">
+    <div class="hero-content container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb justify-content-center">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Case Study</li>
+        </ol>
+      </nav>
+      <h1 class="hero-title" data-aos="fade-up">Family Command Center</h1>
+      <p class="lead text-white-50 mt-3" data-aos="fade-up" data-aos-delay="100">Managing a household shouldn't be a
+        chore.</p>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <!-- ======= Portfolio Details Section ======= -->
+    <section id="portfolio-details" class="portfolio-details section-pad">
+      <div class="container">
+
+        <div class="row gy-5">
+
+          <!-- Left Column: Content (Overview + Info) -->
+          <div class="col-12 col-custom-main order-2 order-lg-1">
+
+            <!-- Project Overview -->
+            <div class="portfolio-description glass-card p-4 mb-5">
+              <h3 class="mb-4">Project Overview</h3>
+              <p>
+                Family Command Center is a comprehensive, cross-platform digital hub designed to modernize household
+                management.
+                Built for both <strong>Web</strong> and <strong>Android</strong> (leveraging React Native), it
+                transforms daily family organization into an engaging, gamified experience.
+              </p>
+              <p>
+                Beyond simple chore tracking, the application introduces a complete ecosystem where kids can earn points
+                through tasks and educational <strong>brain games</strong>,
+                redeeming them for real-world rewards under strict parental supervision. Security is paramount, with a
+                robust <strong>multi-family architecture</strong>
+                that ensures complete data isolation and privacy for every household.
+              </p>
+              <p>
+                From shared grocery lists and expense splitting to real-time family chat, it serves as the central
+                operating system for the modern family,
+                all wrapped in a stunning UI built on <strong>Glassmorphism</strong> principles.
+              </p>
+
+              <h4 class="mt-5 mb-4">Core Features</h4>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-grid-1x2"></i></div>
+                    <div class="feature-text">
+                      <strong>Consolidated Dashboard</strong>
+                      Central view for all family activities.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-basket2"></i></div>
+                    <div class="feature-text">
+                      <strong>Grocery Management</strong>
+                      Real-time shared shopping lists.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-check-circle"></i></div>
+                    <div class="feature-text">
+                      <strong>Chores Management</strong>
+                      Assign, track, and approve daily tasks.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-credit-card-2-front"></i></div>
+                    <div class="feature-text">
+                      <strong>Expense Splitting</strong>
+                      Track shared costs & settle balances.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-chat-text"></i></div>
+                    <div class="feature-text">
+                      <strong>Family Chat</strong>
+                      Group & personal messaging.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-sticky"></i></div>
+                    <div class="feature-text">
+                      <strong>Shared Notes</strong>
+                      Digital sticky notes for announcements.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-puzzle"></i></div>
+                    <div class="feature-text">
+                      <strong>Brain Games</strong>
+                      Educational mini-games for kids.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="feature-item h-100">
+                    <div class="feature-icon"><i class="bi bi-gift"></i></div>
+                    <div class="feature-text">
+                      <strong>Reward System</strong>
+                      Redeem points for real-world rewards.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="feature-item">
+                    <div class="feature-icon"><i class="bi bi-people"></i></div>
+                    <div class="feature-text">
+                      <strong>Kids Management & Parental Control</strong>
+                      Dedicated kids login where they can claim rewards using points earned from chores and brain games.
+                      All actions are fully handled by a parental approval system.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="feature-item">
+                    <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
+                    <div class="feature-text">
+                      <strong>Multi-Family Support</strong>
+                      Complete data isolation ensuring secure and private environments for different families on the
+                      same platform.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project Information (Moved Here) -->
+            <div class="portfolio-info glass-card p-4">
+              <h3>Project Information</h3>
+              <ul class="mb-4">
+                <li><strong>Category</strong> <span>Full-Stack Web & Mobile App</span></li>
+                <li><strong>Clients</strong> <span>Personal / Open Source</span></li>
+                <li><strong>App Launch</strong> <span>2026</span></li>
+                <li><strong>Latest Release</strong> <span>v1.12 (Production)</span></li>
+              </ul>
+
+              <h4 class="mb-3">Tech Stack</h4>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="badge bg-light text-dark border p-2">React 19</span>
+                <span class="badge bg-light text-dark border p-2">React Native</span>
+                <span class="badge bg-light text-dark border p-2">TypeScript</span>
+                <span class="badge bg-light text-dark border p-2">Vite</span>
+                <span class="badge bg-light text-dark border p-2">Supabase</span>
+                <span class="badge bg-light text-dark border p-2">Tailwind CSS</span>
+              </div>
+
+              <div class="d-grid gap-2">
+                <a href="https://family-command-center-taupe.vercel.app/" target="_blank"
+                  class="btn btn-primary btn-lg rounded-pill">
+                  <i class="bi bi-globe me-2"></i> Visit Website
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.familycommandcenter&hl=en-US&ah=ScQT2rU8VD3xPHB5NFawJcast78"
+                  target="_blank" class="btn btn-outline-dark btn-lg rounded-pill">
+                  <i class="bi bi-android2 me-2"></i> Get App
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Carousel (Moved Here) -->
+          <div class="col-12 col-custom-sidebar order-1 order-lg-2">
+            <div class="portfolio-details-slider swiper glass-card p-2 pb-5"
+              style="position: -webkit-sticky; position: sticky; top: 100px; z-index: 10;">
+              <div class="swiper-wrapper align-items-center">
+
+                <!-- 1. Consolidated Dashboard -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Consolidated Dashboard</h3>
+                      <p class="text-white-50">Central Hub for Family Management</p>
+                      <i class="bi bi-grid-1x2-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Grocery Management -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Grocery Management</h3>
+                      <p class="text-white-50">Shared Shopping Lists</p>
+                      <i class="bi bi-basket2-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Chores Management -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Chores Management</h3>
+                      <p class="text-white-50">Assign & Track Tasks</p>
+                      <i class="bi bi-check-circle-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. Expense Splitter -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Expense Tracking</h3>
+                      <p class="text-white-50">Split Bills & Settle Up</p>
+                      <i class="bi bi-credit-card-2-front-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. Chat System -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Family Chat</h3>
+                      <p class="text-white-50">Group & Personal Messaging</p>
+                      <i class="bi bi-chat-text-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 6. Notes -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Shared Notes</h3>
+                      <p class="text-white-50">Sticky Notes & Announcements</p>
+                      <i class="bi bi-sticky-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 7. Brain Games -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Brain Games</h3>
+                      <p class="text-white-50">Developmental Mini-Games</p>
+                      <i class="bi bi-puzzle-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 8. Reward Management -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Reward System</h3>
+                      <p class="text-white-50">Redeem Points for Prizes</p>
+                      <i class="bi bi-gift-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 9. Kids Management -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Kids Management</h3>
+                      <p class="text-white-50">Parental Controls & Approvals</p>
+                      <i class="bi bi-people-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 10. Multi-Family -->
+                <div class="swiper-slide">
+                  <div
+                    class="glass-card p-5 text-center d-flex align-items-center justify-content-center screenshot-card"
+                    style="min-height: 450px; background: linear-gradient(135deg, #64748b 0%, #475569 100%); width: 100%;">
+                    <div>
+                      <h3 class="text-white mb-3">Multi-Family Support</h3>
+                      <p class="text-white-50">Data Isolation & Security</p>
+                      <i class="bi bi-shield-lock-fill text-white" style="font-size: 5rem;"></i>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="swiper-pagination mb-2"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Portfolio Details Section -->
+
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="copyright-box">
+            <p class="copyright">&copy; Copyright <strong>Bibin Antony</strong>. All Rights Reserved</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer><!-- End  Footer -->
+
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/typed.js/typed.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- AOS Animation Library -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
