@@ -230,7 +230,7 @@ function shadeRGBColor(color, percent) {
 
   // returns a promise that resolves to an array of the positions of the branches
   const drawTree = (maxDepth, trunkWidth) => {
-    const scaleFactor = Math.min(window.innerHeight / 440, 1.3); // Adjusted to 640 for tighter fit
+    const scaleFactor = Math.min(window.innerHeight / 500, 1.3); // Adjusted to 640 for tighter fit
     const length = 60 * scaleFactor;
     const scaledTrunkWidth = trunkWidth * scaleFactor;
 
