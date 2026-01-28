@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bibinantony1998.github.io/my-portfolio/sitemap.xml
