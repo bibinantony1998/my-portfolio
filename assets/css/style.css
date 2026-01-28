@@ -204,8 +204,14 @@ a:hover {
 /* Fix for anchor scrolling hiding behind fixed navbar */
 #featured-apps,
 #npm-packages,
-#github-experiments {
+#github-experiments,
+#blog {
     scroll-margin-top: 100px;
+}
+
+#about {
+    /* Slightly less offset for About as per user request */
+    scroll-margin-top: 80px;
 }
 
 .glass-card {
