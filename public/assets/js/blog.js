@@ -1,12 +1,7 @@
-/**
- * Blog Fetcher
- * Fetches blogs from Medium and Dev.to, removes duplicates, and displays them interleaved in a Swiper carousel.
- */
-
 const BLOG_CONFIG = {
     mediumRSS: 'https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@bibinAntonybibinAntony',
     devToAPI: 'https://dev.to/api/articles?username=bibin_antony_9fce1ed9318b',
-    maxPosts: 10 // Increased to allow for scrolling
+    maxPosts: 30
 };
 
 const normalizeTitle = (title) => {
@@ -45,10 +40,29 @@ const areTitlesSimilar = (t1, t2) => {
     return similarity1 > 0.6 || similarity2 > 0.6;
 };
 
+const fetchWithTimeout = async (resource, options = {}) => {
+    const { timeout = 5000 } = options;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(resource, {
+        ...options,
+        signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+};
+
 const fetchMediumBlogs = async () => {
     try {
-        const response = await fetch(BLOG_CONFIG.mediumRSS);
+        console.log('Fetching Medium blogs...');
+        const response = await fetchWithTimeout(BLOG_CONFIG.mediumRSS);
         const data = await response.json();
+
+        if (!data.items) {
+            console.warn('Medium feed returned no items:', data);
+            return [];
+        }
+
         return data.items.map(post => {
             // Extract text from description (which often contains HTML in RSS)
             const tempDiv = document.createElement('div');
@@ -73,7 +87,13 @@ const fetchMediumBlogs = async () => {
 
 const fetchDevToBlogs = async () => {
     try {
-        const response = await fetch(BLOG_CONFIG.devToAPI);
+        console.log('Fetching Dev.to blogs...');
+        const response = await fetchWithTimeout(BLOG_CONFIG.devToAPI);
+
+        if (!response.ok) {
+            throw new Error(`Dev.to API error: ${response.status}`);
+        }
+
         const data = await response.json();
         return data.map(post => ({
             title: post.title,
@@ -174,10 +194,17 @@ const initBlogs = async () => {
         container.innerHTML = swiperHTML;
         container.classList.remove('row', 'g-4'); // Remove grid classes to avoid conflicts
 
-        // Initialize Swiper
+        // Determine if we need to loop (only if we have enough slides)
+        // User reported issue with 4 blogs repeating the 1st one at the end.
+        // For 3 items per view, we need significantly more items to loop smoothly without obvious repetition.
+        // Disabling loop for counts <= 5 to ensure a clean list view for small numbers.
+        const postCount = finalPosts.length;
+        const enableLoop = postCount > 5;
+
+        // Initialize Swiper with dynamic config
         new Swiper('.blog-slider', {
             speed: 600,
-            loop: true,
+            loop: enableLoop,
             autoplay: {
                 delay: 5000,
                 disableOnInteraction: false
@@ -191,15 +218,15 @@ const initBlogs = async () => {
             },
             breakpoints: {
                 640: {
-                    slidesPerView: 1,
+                    slidesPerView: Math.min(postCount, 1),
                     spaceBetween: 20,
                 },
                 768: {
-                    slidesPerView: 2,
+                    slidesPerView: Math.min(postCount, 2),
                     spaceBetween: 20,
                 },
                 1024: {
-                    slidesPerView: 3,
+                    slidesPerView: Math.min(postCount, 3),
                     spaceBetween: 20,
                 }
             }
