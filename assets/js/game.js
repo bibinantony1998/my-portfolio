@@ -16,6 +16,18 @@ const WORLD_SIZE = 140;
 // Physics State
 let angularVelocity = 0;
 let houses = [];
+let activeSection = null; // Track active section for proximity nav
+
+// Fixed Locations for Navigation
+const SECTIONS = [
+    { name: 'About', target: '#about', x: 40, z: 40, rotation: Math.PI / 4 },
+    { name: 'Apps', target: '#featured-apps', x: -40, z: 40, rotation: -Math.PI / 4 },
+    { name: 'Blog', target: '#blog', x: 40, z: -40, rotation: 3 * Math.PI / 4 },
+    { name: 'Contact', target: '#contact', x: -40, z: -40, rotation: -3 * Math.PI / 4 },
+    { name: 'Family', target: 'family-command-center.html', x: 0, z: -70, rotation: Math.PI },
+    { name: 'NPM', target: '#npm-packages', x: 60, z: 0, rotation: -Math.PI / 2 },
+    { name: 'GitHub', target: '#github-experiments', x: -60, z: 0, rotation: Math.PI / 2 }
+];
 
 // Input State
 const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
@@ -85,21 +97,13 @@ function init() {
     createVegetation();
     createClouds();
 
-    // Checkpoints (Houses) - Random Scatter & Clear Spawn
-    let houseCount = 0;
-    while (houseCount < 6) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 30 + Math.random() * 90; // 30 to 120 radius
-        const hx = Math.sin(angle) * radius;
-        const hz = Math.cos(angle) * radius;
+    // Checkpoints (Houses) - Fixed Locations for Navigation
+    // SECTIONS defined globally
 
-        // Final Safety Check
-        if (Math.abs(hx) > 10 || Math.abs(hz) > 10) {
-            createHouse(hx, hz, Math.random() * Math.PI * 2);
-            houseCount++;
-        }
-    }
-
+    // 2. Create Houses
+    SECTIONS.forEach(section => {
+        createHouse(section.x, section.z, section.rotation, section.target, section.name);
+    });
 
     // 6. Car
     createCar();
@@ -110,7 +114,7 @@ function init() {
     document.addEventListener('keyup', (e) => onKey(e, false));
 }
 
-function createHouse(x, z, rotationY) {
+function createHouse(x, z, rotationY, targetUrl, name) {
     const group = new THREE.Group();
 
     // Even Smaller House Dimensions
@@ -138,13 +142,90 @@ function createHouse(x, z, rotationY) {
     door.position.set(0, 0.8, 1.51);
     group.add(door);
 
+    // Label
+    if (name) {
+        const sprite = createTextSprite(name);
+        sprite.position.set(0, 5.5, 0); // Position above the roof
+        group.add(sprite);
+    }
+
     // Position
     const y = getTerrainHeight(x, z);
     group.position.set(x, y, z);
     if (rotationY) group.rotation.y = rotationY;
 
     scene.add(group);
-    obstacles.push({ mesh: group, radius: 2.5, type: 'house' });
+    // Add target url to obstacle object for navigation
+    obstacles.push({ mesh: group, radius: 2.5, type: 'house', target: targetUrl });
+}
+
+function createTextSprite(message) {
+    const fontface = 'Arial';
+    const fontsize = 24;
+    const borderThickness = 4;
+    const borderColor = { r: 50, g: 50, b: 50, a: 1.0 };
+    const backgroundColor = { r: 255, g: 255, b: 255, a: 0.8 };
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    // 1. Measure text to size canvas
+    context.font = "Bold " + fontsize + "px " + fontface;
+    const metrics = context.measureText(message);
+    const textWidth = metrics.width;
+
+    // Canvas sizing (power of 2 is best for textures, but 3JS handles NPOT too)
+    // We'll make it large enough to hold the text with padding
+    canvas.width = textWidth + 20;
+    canvas.height = fontsize + 14;
+
+    // 2. Draw Background
+    context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," +
+        backgroundColor.b + "," + backgroundColor.a + ")";
+    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," +
+        borderColor.b + "," + borderColor.a + ")";
+    context.lineWidth = borderThickness;
+
+    // Rounded rect function
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    roundRect(context, borderThickness / 2, borderThickness / 2,
+        canvas.width - borderThickness, canvas.height - borderThickness, 6);
+
+    // 3. Draw Text
+    context.fillStyle = "rgba(0, 0, 0, 1.0)";
+    context.font = "Bold " + fontsize + "px " + fontface;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(message, canvas.width / 2, canvas.height / 2);
+
+    // 4. Create Texture & Sprite
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    // Scale sprite to be visible in world units
+    // Text should be roughly 2-3 world units wide depending on length
+    // Maintain aspect ratio
+    const aspectRatio = canvas.width / canvas.height;
+    const scaleY = 1.5;
+    sprite.scale.set(scaleY * aspectRatio, scaleY, 1.0);
+
+    return sprite;
 }
 
 function checkCollisions(nextX, nextZ) {
@@ -156,7 +237,7 @@ function checkCollisions(nextX, nextZ) {
 
 
         if (dist < (carRadius + obs.radius)) {
-            return { obstacle: obs.mesh, dist: dist, type: obs.type };
+            return { obstacle: obs.mesh, dist: dist, type: obs.type, target: obs.target };
         }
     }
     return null;
@@ -198,6 +279,37 @@ function updatePhysics() {
     const nextX = car.position.x + Math.sin(car.rotation.y) * velocity;
     const nextZ = car.position.z + Math.cos(car.rotation.y) * velocity;
 
+    // --- PROXIMITY NAVIGATION LOGIC ---
+    // Check if we are near any section
+    let nearestSection = null;
+    const activationRadius = 5; // Radius to activate section scroll
+
+    for (let section of SECTIONS) {
+        const dx = nextX - section.x;
+        const dz = nextZ - section.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < activationRadius) {
+            nearestSection = section;
+            break;
+        }
+    }
+
+    if (nearestSection !== activeSection) {
+        activeSection = nearestSection;
+
+        if (activeSection) {
+            // Entered Section Radius -> Navigate
+            if (activeSection.target.startsWith('#')) {
+                window.location.href = activeSection.target;
+            } else {
+                window.location.href = activeSection.target;
+            }
+        } else {
+            // LEFT all section radii -> Return to Top (Home)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
     // Collision Check
     const col = checkCollisions(nextX, nextZ);
 
@@ -214,8 +326,10 @@ function updatePhysics() {
             car.position.z = nextZ;
 
         } else if (col.type === 'house') {
-            // HOUSE: Stop dead (Park). Logic checkpoint.
+            // HOUSE: Stop dead (Park).
+            // Navigation handled by proximity check above.
             velocity = 0;
+
             // Gentle push out to prevent clipping
             const pushDist = 0.5;
             car.position.x -= Math.cos(angle) * pushDist;
@@ -229,7 +343,7 @@ function updatePhysics() {
             const rightZ = -Math.sin(car.rotation.y);
             const dot = (dx * rightX + dz * rightZ);
 
-            angularVelocity += -dot * 0.2 * (Math.abs(velocity) + 1.0);
+            angularVelocity += -dot * 0.05 * (Math.abs(velocity) + 1.0);
 
             const pushDist = 1.2;
             car.position.x -= Math.cos(angle) * pushDist;
@@ -258,19 +372,6 @@ function updatePhysics() {
     );
     const pitch = (frontH - groundH) * 0.5;
     car.rotation.x = THREE.MathUtils.lerp(car.rotation.x, pitch, 0.1);
-
-    // --- Drive-to-Scroll Sync (Relative/Directional) ---
-    // If driving "Down" (South/Positive Z) -> Scroll Down
-    // If driving "Up" (North/Negative Z) -> Scroll Up
-
-    // Calculate Z movement component
-    const moveZ = Math.cos(car.rotation.y) * velocity;
-
-    // Check Direction logic (Top vs Bottom part approximation)
-    if (Math.abs(moveZ) > 0.01) {
-        const scrollSensitivity = 20.0; // Increased sensitivity
-        window.scrollBy(0, moveZ * scrollSensitivity);
-    }
 
     // Camera Follow
     const relOffset = new THREE.Vector3(0, 7, -14);
@@ -321,6 +422,21 @@ function createSimpleTerrain() {
 }
 
 function createVegetation() {
+    // Helper to check safety
+    function isSafe(x, z) {
+        // Safe from Center Spawn
+        if (Math.abs(x) < 15 && Math.abs(z) < 15) return false;
+
+        // Safe from ALL Houses (Sections)
+        const safeRadius = 15; // Keep rocks/bushes away from houses
+        for (let s of SECTIONS) {
+            const dx = x - s.x;
+            const dz = z - s.z;
+            if ((dx * dx + dz * dz) < (safeRadius * safeRadius)) return false;
+        }
+        return true;
+    }
+
     // Bushes (Spheres)
     const bushGeo = new THREE.SphereGeometry(1, 8, 8);
     const bushMat = new THREE.MeshStandardMaterial({ color: 0x3d8b3d });
@@ -329,8 +445,8 @@ function createVegetation() {
         const x = (Math.random() - 0.5) * 200;
         const z = (Math.random() - 0.5) * 200;
 
-        // Clear Spawn Area
-        if (Math.abs(x) < 15 && Math.abs(z) < 15) continue;
+        // Safety Check
+        if (!isSafe(x, z)) continue;
 
         const bush = new THREE.Mesh(bushGeo, bushMat);
         const y = getTerrainHeight(x, z);
@@ -350,8 +466,8 @@ function createVegetation() {
         const x = (Math.random() - 0.5) * 200;
         const z = (Math.random() - 0.5) * 200;
 
-        // Clear Spawn Area
-        if (Math.abs(x) < 15 && Math.abs(z) < 15) continue;
+        // Safety Check
+        if (!isSafe(x, z)) continue;
 
         const rock = new THREE.Mesh(rockGeo, rockMat);
         const y = getTerrainHeight(x, z);

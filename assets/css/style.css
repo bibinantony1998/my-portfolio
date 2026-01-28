@@ -201,6 +201,13 @@ a:hover {
     align-items: center;
 }
 
+/* Fix for anchor scrolling hiding behind fixed navbar */
+#featured-apps,
+#npm-packages,
+#github-experiments {
+    scroll-margin-top: 100px;
+}
+
 .glass-card {
     background: var(--surface-color);
     backdrop-filter: blur(12px);
