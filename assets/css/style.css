@@ -605,6 +605,13 @@ body.controls-visible #mobile-controls {
     display: flex;
     justify-content: center;
     gap: 30px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .social-links-lg {
+        gap: 15px;
+    }
 }
 
 .social-links-lg a {
