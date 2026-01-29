@@ -10,6 +10,7 @@ export default defineConfig({
                 familyCommandCenter: resolve(__dirname, 'family-command-center.html'),
                 blogSingle: resolve(__dirname, 'blog-single.html'),
                 portfolioDetails: resolve(__dirname, 'portfolio-details.html'),
+                otherTalents: resolve(__dirname, 'other-talents.html'),
             },
         },
         chunkSizeWarningLimit: 1000,
