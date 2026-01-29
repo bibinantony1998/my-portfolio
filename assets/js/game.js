@@ -258,6 +258,15 @@ function updatePhysics() {
     let turnL = keys.a || keys.ArrowLeft;
     let turnR = keys.d || keys.ArrowRight;
 
+    // --- Driving UI Visibility Logic ---
+    // If moving or pressing keys, fade the UI
+    if (Math.abs(velocity) > 0.05 || moveFwd || moveBwd || turnL || turnR) {
+        document.body.classList.add('driving-active');
+    } else {
+        document.body.classList.remove('driving-active');
+    }
+
+
     // Accel
     if (moveFwd) velocity += acceleration;
     if (moveBwd) velocity -= acceleration;
