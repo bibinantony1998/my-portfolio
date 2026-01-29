@@ -29,6 +29,43 @@ const SECTIONS = [
     { name: 'GitHub', target: '#github-experiments', x: -60, z: 0, rotation: Math.PI / 2 }
 ];
 
+// --- Control Visibility Logic ---
+let gameDrivenScroll = false;
+
+// 1. Initial State (At Home) -> Visible
+document.body.classList.add('controls-visible');
+
+// 2. Scroll Listener
+window.addEventListener('scroll', () => {
+    const isAtHome = window.scrollY < window.innerHeight * 0.5;
+
+    if (isAtHome) {
+        document.body.classList.add('controls-visible');
+    } else {
+        // If not at home, only show if it was a game-driven scroll
+        if (gameDrivenScroll) {
+            document.body.classList.add('controls-visible');
+        } else {
+            document.body.classList.remove('controls-visible');
+        }
+    }
+});
+
+// 3. User Interaction Reset
+document.addEventListener('touchstart', (e) => {
+    // If touching controls, ignore
+    if (e.target.closest('#mobile-controls')) return;
+
+    // If touching anywhere else (manual scroll/interaction), reset flag
+    gameDrivenScroll = false;
+
+    // Re-evaluate visibility
+    if (window.scrollY >= window.innerHeight * 0.5) {
+        document.body.classList.remove('controls-visible');
+    }
+}, { passive: true });
+
+
 // Input State
 const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
 
@@ -329,12 +366,15 @@ function updatePhysics() {
 
         if (activeSection) {
             // Entered Section Radius -> Navigate
+            gameDrivenScroll = true; // Mark as game-driven
+            document.body.classList.add('controls-visible'); // Ensure visible
             if (activeSection.target.startsWith('#')) {
                 window.location.href = activeSection.target;
             } else {
                 window.location.href = activeSection.target;
             }
         } else {
+
             // LEFT all section radii -> Return to Top (Home)
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }

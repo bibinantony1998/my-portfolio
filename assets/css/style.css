@@ -27,8 +27,8 @@ body {
     font-family: var(--font-body);
     margin: 0;
     overflow-x: hidden;
-    overscroll-behavior: none;
-    /* Prevent pull-to-refresh on mobile */
+    margin: 0;
+    overflow-x: hidden;
 }
 
 /* Three.js Canvas */
@@ -159,11 +159,23 @@ a:hover {
     height: auto;
     display: none;
     /* Hidden by default, shown on touch/mobile */
+    opacity: 0;
+    /* Visual hidden by default */
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
     pointer-events: none;
-    /* Let clicks pass through empty space */
+    /* No clicks when hidden */
+    transition: opacity 0.3s ease;
+}
+
+/* Base state for showing controls (when layout allows) */
+/* (Media queries handle the display: flex) */
+
+/* Visibility Control */
+body.controls-visible #mobile-controls {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .control-group {
@@ -206,6 +218,21 @@ a:hover {
 (max-width: 768px) {
     #mobile-controls {
         display: flex;
+    }
+
+    #mobile-controls:not(.active-layout) {
+        /* This ensures we strictly follow the JS/class based visibility logic if we want,
+                   but for now, let's keep the media query enabling the layout */
+    }
+
+    /* 
+               Actually, let's simplify. 
+               The requirement is: 
+               1. Mobile/Touch -> Layout exists (display: flex).
+               2. Scroll/Game Logic -> Toggles opacity.
+            */
+    #mobile-controls {
+        display: flex !important;
     }
 
     .game-controls-hint {
