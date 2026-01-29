@@ -27,6 +27,8 @@ body {
     font-family: var(--font-body);
     margin: 0;
     overflow-x: hidden;
+    overscroll-behavior: none;
+    /* Prevent pull-to-refresh on mobile */
 }
 
 /* Three.js Canvas */
@@ -103,6 +105,9 @@ a:hover {
     text-shadow: none;
 }
 
+
+
+
 /* Hero Section */
 #hero {
     height: 100vh;
@@ -145,12 +150,83 @@ a:hover {
     animation: fadeIn 2s ease-out;
 }
 
+/* Mobile Controls */
+#mobile-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: none;
+    /* Hidden by default, shown on touch/mobile */
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+    pointer-events: none;
+    /* Let clicks pass through empty space */
+}
+
+.control-group {
+    display: flex;
+    gap: 20px;
+    pointer-events: auto;
+}
+
+.control-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.1s, background 0.1s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+}
+
+/* Remove specific gas/brake colors for a cleaner Up/Down look, or keep them subtle */
+.control-btn i {
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Show controls only on touch devices or small screens */
+@media (hover: none) and (pointer: coarse),
+(max-width: 768px) {
+    #mobile-controls {
+        display: flex;
+    }
+
+    .game-controls-hint {
+        display: none !important;
+        /* Hide keyboard hints on mobile */
+    }
+}
+
 /* Fading hero content when driving */
 .driving-active #hero .hero-content {
     opacity: 0.1;
     /* Almost invisible but keeps layout */
     pointer-events: none;
     transition: opacity 0.5s ease-out;
+}
+
+/* On mobile, completely hide title when driving */
+@media (max-width: 768px) {
+    .driving-active #hero .hero-content {
+        opacity: 0;
+    }
 }
 
 #hero .hero-content {
@@ -525,15 +601,26 @@ a:hover {
     }
 
     #hero {
-        height: auto;
-        padding-top: 150px;
-        padding-bottom: 50px;
+        height: 100vh;
+        /* Full screen on mobile */
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .hero-content {
+        /* Ensure content is vertically centered in the 100vh container */
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     .section-pad {
         min-height: auto;
         padding: 60px 0;
     }
+
 
     .game-controls-hint {
         position: relative;

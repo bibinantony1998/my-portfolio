@@ -112,6 +112,27 @@ function init() {
     window.addEventListener('resize', onWindowResize);
     document.addEventListener('keydown', (e) => onKey(e, true));
     document.addEventListener('keyup', (e) => onKey(e, false));
+
+    // Mobile Touch Controls
+    const setupMobileControl = (id, key) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            const press = (e) => { e.preventDefault(); keys[key] = true; };
+            const release = (e) => { e.preventDefault(); keys[key] = false; };
+
+            btn.addEventListener('touchstart', press, { passive: false });
+            btn.addEventListener('touchend', release);
+            btn.addEventListener('mousedown', press); // For testing on desktop
+            btn.addEventListener('mouseup', release);
+            btn.addEventListener('mouseleave', release);
+        }
+    };
+
+    setupMobileControl('btn-left', 'ArrowLeft');
+    setupMobileControl('btn-right', 'ArrowRight');
+    setupMobileControl('btn-up', 'ArrowUp');
+    setupMobileControl('btn-down', 'ArrowDown');
+
 }
 
 function createHouse(x, z, rotationY, targetUrl, name) {
