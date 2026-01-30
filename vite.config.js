@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-    base: './', // Use relative paths for assets
+    base: '/my-portfolio/', // Use relative paths for assets
     build: {
         rollupOptions: {
             input: {

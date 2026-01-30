@@ -1,4 +1,5 @@
 {
+  "homepage": "https://bibinantony1998.github.io/my-portfolio/",
   "scripts": {
     "dev": "vite --host",
     "start": "vite",
