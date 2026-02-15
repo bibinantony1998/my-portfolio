@@ -8,8 +8,6 @@ export default defineConfig({
             input: {
                 main: resolve(__dirname, 'index.html'),
                 familyCommandCenter: resolve(__dirname, 'family-command-center.html'),
-                blogSingle: resolve(__dirname, 'blog-single.html'),
-                portfolioDetails: resolve(__dirname, 'portfolio-details.html'),
                 otherTalents: resolve(__dirname, 'other-talents.html'),
             },
         },
