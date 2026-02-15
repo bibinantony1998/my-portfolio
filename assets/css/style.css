@@ -47,6 +47,10 @@ h1,
 h2,
 h3,
 h4,
+.h1,
+.h2,
+.h3,
+.h4,
 .section-title,
 .navbar-brand {
     font-family: var(--font-heading);
@@ -516,8 +520,10 @@ body.controls-visible #mobile-controls {
 }
 
 /* Stats */
-.stat-item h3 {
+.stat-item .h3 {
     font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
     color: var(--accent-primary);
     margin-bottom: 0;
 }
