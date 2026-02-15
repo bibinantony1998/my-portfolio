@@ -14,7 +14,6 @@ const EXCLUDE_FILES = [
 const PRIORITY_PAGES = {
     'index.html': 1.0,
     'family-command-center.html': 0.8,
-    'portfolio-details.html': 0.8,
     'other-talents.html': 0.7
 };
 
